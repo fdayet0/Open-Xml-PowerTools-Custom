@@ -84,15 +84,37 @@ namespace OpenXmlPowerTools
 
         public static PmlDocument BuildPresentation(List<SlideSource> sources)
         {
-            using (OpenXmlMemoryStreamDocument streamDoc = OpenXmlMemoryStreamDocument.CreatePresentationDocument())
+            // Créer le document OpenXmlMemoryStreamDocument
+            using OpenXmlMemoryStreamDocument openXmlMemoryStreamDocument = OpenXmlMemoryStreamDocument.CreatePresentationDocument();
+            
+            // Ouvrir le PresentationDocument à partir de OpenXmlMemoryStreamDocument
+            using (PresentationDocument output = openXmlMemoryStreamDocument.GetPresentationDocument())
             {
-                using (PresentationDocument output = streamDoc.GetPresentationDocument())
-                {
-                    BuildPresentation(sources, output);
-                    output.Close();
-                }
-                return streamDoc.GetModifiedPmlDocument();
+                // Créer le document XML de présentation
+                XNamespace xNamespace = "http://schemas.openxmlformats.org/presentationml/2006/main";
+                XNamespace value = "http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+                XNamespace value2 = "http://schemas.openxmlformats.org/drawingml/2006/main";
+                
+                output.PresentationPart.PutXDocument(new XDocument(
+                    new XElement(xNamespace + "presentation",
+                        new XAttribute(XNamespace.Xmlns + "a", value2),
+                        new XAttribute(XNamespace.Xmlns + "r", value),
+                        new XAttribute(XNamespace.Xmlns + "p", xNamespace),
+                        new XElement(xNamespace + "sldMasterIdLst"),
+                        new XElement(xNamespace + "sldIdLst"),
+                        new XElement(xNamespace + "notesSz", 
+                            new XAttribute((XName)"cx", "6858000"),
+                            new XAttribute((XName)"cy", "9144000")
+                        )
+                    )
+                ));
+        
+                // Construire la présentation avec les sources
+                BuildPresentation(sources, output);
             }
+        
+            // Retourner le document modifié
+            return openXmlMemoryStreamDocument.GetModifiedPmlDocument();
         }
 
         private static void BuildPresentation(List<SlideSource> sources, PresentationDocument output)
