@@ -84,7 +84,7 @@ namespace OpenXmlPowerTools
 
         public static PmlDocument BuildPresentation(List<SlideSource> sources)
         {
-            using (OpenXmlMemoryStreamDocument streamDoc = OpenXmlMemoryStreamDocument.CreatePresentationDocument())
+            using (OpenXmlMemoryStreamDocument streamDoc = CreateLocalPresentationDocument())
             {
                 using (PresentationDocument output = streamDoc.GetPresentationDocument())
                 {
@@ -94,7 +94,7 @@ namespace OpenXmlPowerTools
             }
         }
 
-        public static OpenXmlMemoryStreamDocument CreatePresentationDocument()
+        public static OpenXmlMemoryStreamDocument CreateLocalPresentationDocument()
         {
             MemoryStream stream = new MemoryStream();
             using (PresentationDocument presentationDocument = PresentationDocument.Create(stream, PresentationDocumentType.Presentation))
