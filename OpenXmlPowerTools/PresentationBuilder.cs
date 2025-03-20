@@ -8,6 +8,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Text;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml;
 
 namespace OpenXmlPowerTools
 {
@@ -90,6 +91,21 @@ namespace OpenXmlPowerTools
                     BuildPresentation(sources, output);
                 }
                 return streamDoc.GetModifiedPmlDocument();
+            }
+        }
+
+        public static OpenXmlMemoryStreamDocument CreatePresentationDocument()
+        {
+            MemoryStream stream = new MemoryStream();
+            using (PresentationDocument presentationDocument = PresentationDocument.Create(stream, PresentationDocumentType.Presentation))
+            {
+                presentationDocument.AddPresentationPart();
+                XNamespace xNamespace = (XNamespace)"http://schemas.openxmlformats.org/presentationml/2006/main";
+                XNamespace value = (XNamespace)"http://schemas.openxmlformats.org/officeDocument/2006/relationships";
+                XNamespace value2 = (XNamespace)"http://schemas.openxmlformats.org/drawingml/2006/main";
+                presentationDocument.PresentationPart.PutXDocument(new XDocument(new XElement(xNamespace + "presentation", new XAttribute(XNamespace.Xmlns + "a", value2), new XAttribute(XNamespace.Xmlns + "r", value), new XAttribute(XNamespace.Xmlns + "p", xNamespace), new XElement(xNamespace + "sldMasterIdLst"), new XElement(xNamespace + "sldIdLst"), new XElement(xNamespace + "notesSz", new XAttribute((XName)"cx", "6858000"), new XAttribute((XName)"cy", "9144000")))));
+                ((OpenXmlPackage)presentationDocument).Dispose();
+                return new OpenXmlMemoryStreamDocument(stream);
             }
         }
 
